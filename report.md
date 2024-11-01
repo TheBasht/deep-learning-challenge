@@ -11,10 +11,10 @@ The purpose of this analysis was to build a deep learning model capable of predi
   The target variable for our model is `IS_SUCCESSFUL`, which indicates whether a funding application was successful.
 
 - **Feature Variables**:  
-  The feature variables include `ASK_AMT`, `APPLICATION_TYPE`, `CLASSIFICATION`, `AFFILIATION`, `USE_CASE`, `ORGANIZATION`, `INCOME_AMT`, and `STATUS`, which were one-hot encoded to allow the neural network to process categorical data effectively.
+  The feature variables include `ASK_AMT`, `APPLICATION_TYPE`, `CLASSIFICATION`, `AFFILIATION`, `ORGANIZATION`, and `INCOME_AMT`, which were one-hot encoded to allow the neural network to process categorical data effectively.
 
 - **Variables Removed**:  
-  The `EIN` and `NAME` columns were removed from the dataset as they serve as unique identifiers and do not contribute meaningful information to the predictive power of the model.
+  The columns `EIN`, `NAME`, `STATUS`, `SPECIAL_CONSIDERATIONS`, and `USE_CASE` were removed from the dataset. These columns either served as unique identifiers or were determined to be unnecessary for predictive modeling, as they do not add meaningful information to the model's performance in the optimized version.
 
 ### Compiling, Training, and Evaluating the Model
 
@@ -24,17 +24,31 @@ The purpose of this analysis was to build a deep learning model capable of predi
   - **Hidden Layers**: We used two hidden layers with 80 and 30 neurons, respectively, and a ReLU activation function for each layer. This architecture was chosen to balance model complexity and computational efficiency.
   - **Output Layer**: A single neuron with a sigmoid activation function was used in the output layer to provide a probability of the application being successful.
 
-- **Model Performance**:  
-  The target performance for the model was an accuracy of at least 75%. However, the original model consistently underperformed, reaching accuracy levels below this threshold, even after various optimizations.
+- **Model Architecture**:  
+  The optimized model was designed with the following architecture:
+  
+  - **Input Layer**: This layer took in a number of features equal to the number of one-hot encoded columns (features) after preprocessing.
 
-- **Improvement Attempts**:
-  - **Increased Neurons**: We experimented with increasing the number of neurons in each hidden layer.
-  - **Added Dropout Layers**: To reduce overfitting, we added dropout layers with dropout rates between 0.2 and 0.4.
-  - **Batch Normalization**: We included batch normalization layers to stabilize learning and improve convergence.
-  - **Different Activation Functions**: Various activation functions, including ReLU, ELU, and Swish, were tested across the hidden layers to see if they could improve performance.
-  - **Additional Hidden Layers**: We also experimented with deeper architectures, adding up to eight layers with a mix of neuron counts, dropout, and batch normalization.
+  - **Hidden Layers**: We employed an architecture with up to 8 hidden layers to enhance model performance. Each layer had varying numbers of neurons, designed to capture complex relationships in the data:
+    - **Layer 1**: 512 neurons with a `swish` activation function, followed by a Dropout of 0.4 for regularization and Batch Normalization.
+    - **Layer 2**: 256 neurons with `swish`, Dropout of 0.4, and Batch Normalization.
+    - **Layer 3**: 128 neurons with `swish`, Dropout of 0.4, and Batch Normalization.
+    - **Layer 4**: 128 neurons with `swish`, Dropout of 0.4, and Batch Normalization.
+    - **Layer 5**: 64 neurons with `swish`, Dropout of 0.4, and Batch Normalization.
+    - **Layer 6**: 64 neurons with `swish`, Dropout of 0.4, and Batch Normalization.
+    - **Layer 7**: 32 neurons with `swish`, Dropout of 0.4, and Batch Normalization.
+    - **Layer 8**: 16 neurons with `swish`, Dropout of 0.4, and Batch Normalization.
+    
+    The `swish` activation function was chosen for all hidden layers to take advantage of its smooth, non-monotonic properties, which have shown to help in training deep networks. This setup was executed with the assistance of a GPU to handle the computational demands efficiently.
+
+  - **Output Layer**: A single neuron with a `sigmoid` activation function was used in the output layer to provide a probability of the application being successful.
+  
+  - **Early Stopping**: To prevent overfitting, early stopping was implemented, monitoring validation loss with a patience parameter of 10 epochs.
+  
+  This model was trained with up to 8 hidden layers and optimized using a GPU for faster computation.
+
 
   Despite these efforts, the model's performance remained below the 75% accuracy target.
 
 ### Summary
-The deep learning model demonstrated potential but fell short of the target accuracy. The performance may be hindered by the limitations of the neural network architecture or the nature of the data itself. For future attempts, a model change could be beneficial. A recommendation would be to explore ensemble models, such as Random Forest or XGBoost, which are known to perform well on tabular data with categorical features. Ensemble methods could capture complex patterns that the neural network struggled with and may be better suited for this specific classification problem.
+The deep learning model demonstrated potential but fell short of the target accuracy. The performance may be hindered by the limitations of the neural network architecture or the nature of the data itself.
